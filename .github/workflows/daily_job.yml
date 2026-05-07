@@ -1,0 +1,26 @@
+name: Daily Auto Push
+
+on:
+  schedule:
+    - cron: '0 9,15,21 * * *'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+      - name: Ejecutar script
+        run: python daily_push.py
+      - name: Commit y Push
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add log.txt
+          git commit -m "Update log" || exit 0
+          git push
