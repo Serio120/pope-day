@@ -5,22 +5,32 @@ on:
     - cron: '0 9,15,21 * * *'
   workflow_dispatch:
 
+# Aquí forzamos el uso de Node 24 a nivel global del workflow
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v4
+      # Hemos subido a las versiones más recientes de las acciones
+      - name: Checkout código
+        uses: actions/checkout@v4 
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5 # Actualizado a v5
         with:
-          python-version: '3.x'
+          python-version: '3.12'
+
       - name: Ejecutar script
         run: python daily_push.py
+
       - name: Commit y Push
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add log.txt
-          git commit -m "Update log" || exit 0
+          git commit -m "Update log: $(date)" || exit 0
           git push
