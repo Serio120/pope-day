@@ -5,10 +5,6 @@ on:
     - cron: '0 9,15,21 * * *'
   workflow_dispatch:
 
-# Forzamos Node 24 a nivel de todo el proceso
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -17,14 +13,11 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          # Esto ayuda a evitar problemas de permisos en algunos runners
-          persist-credentials: true
 
       - name: Configurar Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: '3.11' # Versión super estable
 
       - name: Ejecutar script
         run: python daily_push.py
@@ -33,4 +26,6 @@ jobs:
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-          git add log.txt```
+          git add log.txt
+          git commit -m "Update daily log" || exit 0
+          git push
